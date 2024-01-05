@@ -1,6 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import mongoose, {Model }from 'mongoose';
@@ -32,26 +30,35 @@ export class UsersService {
     return res;
   }
 
-  async findById(id: string): Promise<User> {
+  async findById(requestingUserId: string, role: string, id: string): Promise<User> {
     const user = await this.userModel.findById(id);
 
     if (!user) {
       throw new NotFoundException('User not found.');
     }
 
+    if (requestingUserId !== id && role !=="admin") {
+      throw new UnauthorizedException('Unauthorized access to user data');
+    }
+
     return user;
   }
 
-  async updateById(id: string, user: User): Promise<User> {
+  async updateById(
+    requestingUserId: string, role:string,
+    id: string,
+    user: User,
+  ): Promise<User> {
+    if (requestingUserId !== id && role !== 'admin') {
+      throw new UnauthorizedException('Unauthorized update of user data');
+    }
+
     return await this.userModel.findByIdAndUpdate(id, user, {
       new: true,
       runValidators: true,
     });
   }
-
   async deleteById(id: string): Promise<any> {
-    // return await this.UserModel.findByIdAndDelete(id);
-
     const deletedUser = await this.userModel.findByIdAndDelete(id);
 
     if (!deletedUser) {

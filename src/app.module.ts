@@ -9,8 +9,6 @@ import { User, UserSchema } from './users/schemas/user.schema';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
-
 
 @Module({
   imports: [
@@ -25,7 +23,7 @@ import { JwtModule } from '@nestjs/jwt';
       { name: User.name, schema: UserSchema },
     ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
-   
+
     AuthModule,
     UsersModule,
     ProjectsModule,

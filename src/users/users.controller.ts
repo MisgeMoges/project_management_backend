@@ -1,5 +1,5 @@
 
-import { Controller,Post, Body, Get, Param, Put, Delete, UseGuards } from '@nestjs/common';
+import { Controller,Post, Body, Get, Param, Put, Delete, UseGuards, Req } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/role.decorator';
 import { RolesGuard } from '../auth/role.guard';
@@ -7,6 +7,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './schemas/user.schema';
+import { AuthGuard } from '@nestjs/passport';
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
@@ -18,7 +19,8 @@ export class UsersController {
   async getAllUsers(): Promise<User[]> {
     return this.userService.findAll();
   }
-
+  @Roles('admin')
+  @UseGuards(RolesGuard)
   @Post()
   async createUser(
     @Body()
@@ -28,23 +30,21 @@ export class UsersController {
   }
 
   @Get(':id')
-  async getUser(
-    @Param('id')
-    id: string,
-  ): Promise<User> {
-    return this.userService.findById(id);
+  async getUser(@Req() req, @Param('id') id: string): Promise<User> {
+    const {requestingUserId, role }= req.user;
+    return this.userService.findById(requestingUserId, role, id);
   }
-
   @Put(':id')
   async updateUser(
-    @Param('id')
-    id: string,
-    @Body()
-    user: UpdateUserDto,
+    @Req() req,
+    @Param('id') id: string,
+    @Body() user: UpdateUserDto,
   ): Promise<User> {
-    return this.userService.updateById(id, user);
+    const {requestingUserId, role} = req.user;
+    return this.userService.updateById(requestingUserId,role, id, user);
   }
-
+  @Roles('admin')
+  @UseGuards(RolesGuard)
   @Delete(':id')
   async deleteUser(
     @Param('id')

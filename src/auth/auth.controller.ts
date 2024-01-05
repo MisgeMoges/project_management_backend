@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, ValidationPipe ,UsePipes} from '@nestjs/common';
+import { Response, Request } from 'express'; // Import Request and Response from express
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { SignUpDto } from './dto/signup.dto';
@@ -8,12 +9,21 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('/signup')
-  async signUp(@Body() signUpDto: SignUpDto): Promise<{ token: string }> {
-    return this.authService.signUp(signUpDto);
+  @UsePipes(ValidationPipe)
+  async signUp(
+    @Body() signUpDto: SignUpDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ token: string }> {
+    return this.authService.signUp(signUpDto, res);
   }
 
   @Post('/login')
- async login(@Body() loginDto: LoginDto): Promise<{ token: string }> {
-    return this.authService.login(loginDto);
+  @UsePipes(ValidationPipe)
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ token: string }> {
+    const result = await this.authService.login(loginDto, res);
+    return result;
   }
 }
