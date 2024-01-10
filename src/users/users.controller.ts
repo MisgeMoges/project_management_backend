@@ -41,7 +41,7 @@ export class UsersController {
     @Body() user: UpdateUserDto,
   ): Promise<User> {
     const {requestingUserId, role} = req.user;
-    return this.userService.updateById(requestingUserId,role, id, user);
+    return this.userService.updateById(requestingUserId, role, id, user);
   }
   @Roles('admin')
   @UseGuards(RolesGuard)

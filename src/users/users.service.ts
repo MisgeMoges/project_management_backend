@@ -36,7 +36,6 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User not found.');
     }
-
     if (requestingUserId !== id && role !=="admin") {
       throw new UnauthorizedException('Unauthorized access to user data');
     }

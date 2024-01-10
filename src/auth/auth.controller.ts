@@ -13,7 +13,7 @@ export class AuthController {
   async signUp(
     @Body() signUpDto: SignUpDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<{ token: string }> {
+  ): Promise<{ token: string, role:string }> {
     return this.authService.signUp(signUpDto, res);
   }
 
@@ -22,7 +22,7 @@ export class AuthController {
   async login(
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<{ token: string }> {
+  ): Promise<{ token: string, role:string }> {
     const result = await this.authService.login(loginDto, res);
     return result;
   }

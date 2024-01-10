@@ -23,7 +23,7 @@ export class AuthService {
   async signUp(
     signUpDto: SignUpDto,
     res: Response,
-  ): Promise<{ token: string }> {
+  ): Promise<{ token: string, role:string }> {
     const { firstName, lastName, email, phoneNumber, password } = signUpDto;
     const existingEmail = await this.userModel.findOne({
       email,
@@ -54,10 +54,10 @@ export class AuthService {
         signed: true,
         secure: false,
       });
-    return { token };
+    return { token:token,role:user.role  };
   }
 
-  async login(loginDto: LoginDto, res: Response): Promise<{ token: string }> {
+  async login(loginDto: LoginDto, res: Response): Promise<{ token: string, role:string }> {
     const { email, password } = loginDto;
 
     const user = await this.userModel.findOne({ email });
@@ -83,6 +83,6 @@ export class AuthService {
       signed: true,
       secure: false,
     });
-    return { token };
+    return { token:token, role:user.role };
   }
 }
